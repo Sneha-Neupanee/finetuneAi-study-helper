@@ -5,30 +5,32 @@ import mongoose from "mongoose";
 import chatRoute from "./routes/chat.js";
 import taskRoute from "./routes/task.js";
 
-/* 1. Load env FIRST */
 dotenv.config();
 
-/* 2. Create app */
 const app = express();
 
-/* 3. Middleware */
-app.use(cors());
+/* Middleware */
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true
+}));
 app.use(express.json());
-app.use("/task", taskRoute);
 
-/* 4. Routes */
+/* Routes */
+app.use("/task", taskRoute);
 app.use("/chat", chatRoute);
 
 app.get("/", (req, res) => {
   res.send("FineTuneAI Backend Running");
 });
 
-/* 5. MongoDB connection */
+/* MongoDB + Server */
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB connected"))
-  .catch(err => console.log("Mongo error:", err));
+  .then(() => {
+    console.log("MongoDB connected");
 
-/* 6. Start server */
-app.listen(5000, () => {
-  console.log("Server running on port 5000");
-});
+    app.listen(5000, () => {
+      console.log("Server running on port 5000");
+    });
+  })
+  .catch(err => console.log("Mongo error:", err));
